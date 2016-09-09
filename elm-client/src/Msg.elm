@@ -4,7 +4,7 @@ import Phoenix.Socket
 import Json.Encode as JE
 import Json.Decode as JD
 import Chat
-import Types exposing (User, Message)
+import Types exposing (User, Message, OpinionAboutPost)
 import Material
 import Material.Snackbar as Snackbar
 
@@ -27,3 +27,5 @@ type Msg
     | Snackbar (Snackbar.Msg (Maybe Msg))
     | SelectTab Int
     | GetHistory String
+
+

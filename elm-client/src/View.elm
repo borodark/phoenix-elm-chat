@@ -4,7 +4,7 @@ import Msg exposing (Msg(..))
 import Model exposing (Model)
 import Chat
 import Utils exposing (twoWayChatChannelFor)
-import Types exposing (User)
+import Types exposing (User, OpinionAboutPost)
 import Html.App as App
 import Dict exposing (Dict)
 import Html exposing (..)

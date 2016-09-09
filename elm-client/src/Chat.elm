@@ -1,12 +1,12 @@
 module Chat exposing (view, initialModel, update, Model, Msg(..), OutMsg(..), encodeMessage)
 
 import Html exposing (..)
-import Html.Attributes exposing (value, placeholder, class)
+import Html.Attributes exposing (value, placeholder, class, type', name)
 import Html.Events exposing (onInput, onClick, onSubmit)
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
 import Styles
-import Types exposing (User, Message)
+import Types exposing (User, Message, OpinionAboutPost)
 import Material
 import Material.Card as Card
 import Material.Options as Options
@@ -23,6 +23,7 @@ type Msg
     | ReceiveHistory JE.Value
     | SendMessage
     | Mdl (Material.Msg Msg)
+    | Rate OpinionAboutPost
 
 
 type OutMsg
@@ -35,6 +36,7 @@ type alias Model =
     , messages : List Message
     , users : List User
     , mdl : Material.Model
+    , rated : List OpinionAboutPost
     }
 
 
@@ -45,6 +47,7 @@ initialModel =
     , messages = []
     , users = []
     , mdl = Material.model
+    , rated = []
     }
 
 
@@ -53,6 +56,12 @@ update msg model =
     case msg of
         SetNewMessage string ->
             ( { model | newMessage = string }
+            , Cmd.none
+            , Nothing
+            )
+
+        Rate aRating ->
+            ( { model | rated = model.rated ++ [ aRating ] }
             , Cmd.none
             , Nothing
             )
@@ -139,9 +148,31 @@ viewMessage message =
             , List.body
                 []
                 [ Markdown.toHtml [] message.body
+                , div
+                    [ Html.Attributes.style [("display","inline")] ]
+                    [ likeButtons ""
+                        [ (message, "Love", Rate Types.Love )
+                        , (message, "Like", Rate Types.Like )
+                        , (message, "Noooo!", Rate Types.DontLike )
+                        ]
+                    ]
                 ]
             ]
         ]
+
+
+likeButtons : String -> List ( Message, String, Msg ) -> Html Msg
+likeButtons pickerClass options =
+    fieldset [] (List.map like options)
+
+
+like : (Message, String, Msg ) -> Html Msg
+like (message, aName, msg ) =
+     div [  class "signup-button", onClick msg ] [ text aName ]
+ --   label []
+   --     [ input [ type' "radio", onClick msg ] []
+     --   , text aName
+       -- ]
 
 
 messageInputView : Model -> Html Msg

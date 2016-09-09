@@ -7,6 +7,18 @@ type alias User =
 
 
 type alias Message =
-    { user : String
+    { -- id : Int
+      --,
+      user : String
     , body : String
     }
+
+
+
+-- ++, +, -
+
+
+type OpinionAboutPost
+    = Love
+    | Like
+    | DontLike
