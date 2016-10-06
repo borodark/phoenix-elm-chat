@@ -23,7 +23,7 @@ type Msg
     | ReceiveHistory JE.Value
     | SendMessage
     | Mdl (Material.Msg Msg)
-    | Rate OpinionAboutPost
+    | Rate OpinionAboutPost Message
 
 
 type OutMsg
@@ -31,28 +31,35 @@ type OutMsg
 
 
 type alias Model =
-    { newMessage : String
+    { currentUser : String
+    , newMessage : String
     , topic : String
     , messages : List Message
     , users : List User
-    , mdl : Material.Model
-    , rated : List OpinionAboutPost
+    , mdl :
+        Material.Model
+        --    , rated : List OpinionAboutPost
     }
 
 
 initialModel : Model
 initialModel =
-    { newMessage = ""
+    { currentUser = "From Initial Model"
+    , newMessage = ""
     , topic = ""
     , messages = []
     , users = []
-    , mdl = Material.model
-    , rated = []
+    , mdl =
+        Material.model
+        -- , rated = []
     }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg, Maybe OutMsg )
 update msg model =
+    let
+       som = Debug.log "From update top -> User is:" model
+    in
     case msg of
         SetNewMessage string ->
             ( { model | newMessage = string }
@@ -60,11 +67,17 @@ update msg model =
             , Nothing
             )
 
-        Rate aRating ->
-            ( { model | rated = model.rated ++ [ aRating ] }
-            , Cmd.none
-            , Nothing
-            )
+        Rate aRating aMessage ->
+            let
+                aNewRating =
+                    Debug.log "From Update -> User is:" model.currentUser
+
+                -- add user name to aMessage list of opinions that is tuple of (Love, [list of user names clicked Love button])
+            in
+                ( { model | messages = model.messages ++ [ aMessage ] }
+                , Cmd.none
+                , Nothing
+                )
 
         SendMessage ->
             ( { model | newMessage = "" }
@@ -113,6 +126,9 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
+    let
+        aValue = Debug.log "From Chat.view User is:" model.currentUser
+    in
     Card.view
         [ Options.css "width" "100%"
         , Elevation.e2
@@ -132,6 +148,10 @@ view model =
 
 messageListView : Model -> Html Msg
 messageListView model =
+    let
+        aValue = Debug.log "From messageListView -> User is:" model.currentUser
+    in
+
     List.ul
         []
         (List.map viewMessage model.messages)
@@ -149,11 +169,11 @@ viewMessage message =
                 []
                 [ Markdown.toHtml [] message.body
                 , div
-                    [ Html.Attributes.style [("display","inline")] ]
+                    [ Html.Attributes.style [ ( "display", "inline" ) ] ]
                     [ likeButtons ""
-                        [ (message, "Love", Rate Types.Love )
-                        , (message, "Like", Rate Types.Like )
-                        , (message, "Noooo!", Rate Types.DontLike )
+                        [ ( message, "Love", Rate Types.Love message )
+                        , ( message, "Like", Rate Types.Like message )
+                        , ( message, "Noooo!", Rate Types.DontLike message )
                         ]
                     ]
                 ]
@@ -166,13 +186,16 @@ likeButtons pickerClass options =
     fieldset [] (List.map like options)
 
 
-like : (Message, String, Msg ) -> Html Msg
-like (message, aName, msg ) =
-     div [  class "signup-button", onClick msg ] [ text aName ]
- --   label []
-   --     [ input [ type' "radio", onClick msg ] []
-     --   , text aName
-       -- ]
+like : ( Message, String, Msg ) -> Html Msg
+like ( message, aName, msg ) =
+    div [ class "signup-button", onClick msg ] [ text aName ]
+
+
+
+--   label []
+--     [ input [ type' "radio", onClick msg ] []
+--   , text aName
+-- ]
 
 
 messageInputView : Model -> Html Msg
@@ -206,6 +229,10 @@ chatMessageDecoder =
             ]
         )
         ("body" := JD.string)
+
+
+
+-- ( oneOf "opinions" := Message Nothing )
 
 
 chatHistoryDecoder : JD.Decoder (List Message)

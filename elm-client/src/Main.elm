@@ -106,7 +106,7 @@ update msg model =
                                     Chat.initialModel
 
                                 newChat =
-                                    { initialChatModel | topic = channelName }
+                                    { initialChatModel | topic = channelName, currentUser = model.username }
 
                                 newChatWrapper =
                                     ChatWrapper newChat 0 0

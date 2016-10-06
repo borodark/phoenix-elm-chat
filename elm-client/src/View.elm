@@ -64,7 +64,13 @@ chatsView model =
                     div [] []
 
                 Just chatWrapper ->
-                    chatView ( currentChat, chatWrapper.model )
+                    let
+                        aChatWrapperModel = chatWrapper.model
+                        -- the above is Chat.model  
+                        newChatWrapperModel = { aChatWrapperModel | currentUser = model.username }
+                        
+                    in
+                    chatView ( currentChat, newChatWrapperModel )
 
 
 roomsView : Model -> Html Msg
