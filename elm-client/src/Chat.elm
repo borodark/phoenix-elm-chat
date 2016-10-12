@@ -23,7 +23,7 @@ type Msg
     | ReceiveHistory JE.Value
     | SendMessage
     | Mdl (Material.Msg Msg)
-    | Rate OpinionAboutPost Message
+    | Rate OpinionAboutPost Int
 
 
 type OutMsg
@@ -36,9 +36,7 @@ type alias Model =
     , topic : String
     , messages : List Message
     , users : List User
-    , mdl :
-        Material.Model
-        --    , rated : List OpinionAboutPost
+    , mdl : Material.Model
     }
 
 
@@ -49,9 +47,7 @@ initialModel =
     , topic = ""
     , messages = []
     , users = []
-    , mdl =
-        Material.model
-        -- , rated = []
+    , mdl = Material.model
     }
 
 
@@ -67,14 +63,17 @@ update msg model =
             , Nothing
             )
 
-        Rate aRating aMessage ->
+        Rate aRating aMessageId ->
             let
-                aNewRating =
-                    Debug.log "From Update -> User is:" model.currentUser
-
-                -- add user name to aMessage list of opinions that is tuple of (Love, [list of user names clicked Love button])
+                aCurrentUser = Debug.log "Rate from User -> : " model.currentUser
+                aNewMessage =
+                    Debug.log "Rate Message -> : " aMessageId
+                aNewRating = Debug.log "Rated -> : " aRating
+                -- TODO Perhaps find message in model.messages 
+                -- TODO Send current user and message id to endpoint collecting likes
+                --
             in
-                ( { model | messages = model.messages ++ [ aMessage ] }
+                ( { model | messages = model.messages }
                 , Cmd.none
                 , Nothing
                 )
@@ -171,9 +170,9 @@ viewMessage message =
                 , div
                     [ Html.Attributes.style [ ( "display", "inline" ) ] ]
                     [ likeButtons ""
-                        [ ( message, "Love", Rate Types.Love message )
-                        , ( message, "Like", Rate Types.Like message )
-                        , ( message, "Noooo!", Rate Types.DontLike message )
+                        [ ( message, "Love" , Rate Types.Love message.id )
+                        , ( message, "Like", Rate Types.Like message.id )
+                        , ( message, "Noooo!", Rate Types.DontLike message.id )
                         ]
                     ]
                 ]
@@ -222,7 +221,8 @@ userView user =
 
 chatMessageDecoder : JD.Decoder Message
 chatMessageDecoder =
-    JD.object2 Message
+    JD.object3 Message
+        ("id" := JD.int)
         (JD.oneOf
             [ ("user" := JD.string)
             , JD.succeed "anonymous"

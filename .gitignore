@@ -1,2 +1,5 @@
 elm-stuff
 **/elm.js
+elm-client/index.html
+elm-client/src/elm-package.json
+node_modules/

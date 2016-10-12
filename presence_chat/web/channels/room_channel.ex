@@ -24,7 +24,7 @@ defmodule PresenceChat.RoomChannel do
       (from m in PresenceChat.ChatMessage,
         where: m.channel == ^socket.topic
       ) |> Repo.all
-        |> Enum.map &(%{user: &1.username, body: &1.body})
+        |> Enum.map &(%{id: &1.id, user: &1.username, body: &1.body})
     push socket, "history:list", %{history: messages}
     {:reply, :ok, socket}
   end

@@ -7,7 +7,7 @@ use Mix.Config
 
 # General application configuration
 config :presence_chat,
-  ecto_repos: [PresenceChat.Repo]
+  ecto_repos: [PresenceChat.Repo] # TODO add KV repo for likes here
 
 # Configures the endpoint
 config :presence_chat, PresenceChat.Endpoint,

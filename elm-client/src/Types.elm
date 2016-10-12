@@ -18,7 +18,9 @@ type alias Opinions =
 
 
 type alias Message =
-    { user : String
+    {
+      id : Int
+    , user : String
     , body : String
 --    , opinions : List Opinions
     }
